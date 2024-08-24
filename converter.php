@@ -10,7 +10,7 @@ function logError($message) {
 function ConvertionToWebp($source) {
     $quality = 75;  // Set quality (0-100, default = 75)
 
-    $width = 0;
+    $width = 300;
     $height = 0;
 
     $webpDirectory = dirname($source) . DIRECTORY_SEPARATOR . 'webp';
