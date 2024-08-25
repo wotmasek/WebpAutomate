@@ -2,20 +2,19 @@
 
 function logError($message) {
     $source = __FILE__;
-    $logFile = dirname($source) . DIRECTORY_SEPARATOR . 'webp' . DIRECTORY_SEPARATOR . 'converter_error.log'; // Ścieżka do pliku logów
-    $timestamp = date('Y-m-d H:i:s'); // Dodanie znacznika czasowego
+    $logFile = dirname($source) . DIRECTORY_SEPARATOR . 'converter_error.log'; 
+
+    if (!file_exists($logFile)) {
+        touch($logFile);
+    }
+
+    $timestamp = date('Y-m-d H:i:s'); 
     file_put_contents($logFile, "[$timestamp] $message\n", FILE_APPEND);
 }
 
-function ConvertionToWebp($source) {
-    $quality = 75;  // Set quality (0-100, default = 75)
-
-    $width = 300;
-    $height = 0;
-
+function ConvertionToWebp($source, $quality = 75, $width = 0, $height = 0) {
     $webpDirectory = dirname($source) . DIRECTORY_SEPARATOR . 'webp';
 
-    // Sprawdzenie istnienia katalogu i jego utworzenie
     if (!is_dir($webpDirectory)) {
         if (!mkdir($webpDirectory, 0755, true)) {
             logError("Nie udało się utworzyć katalogu '$webpDirectory'.");
@@ -23,22 +22,38 @@ function ConvertionToWebp($source) {
         }
     }
 
-    // Przygotowanie ścieżki do pliku docelowego
-    $destination = $webpDirectory . DIRECTORY_SEPARATOR . pathinfo($source, PATHINFO_FILENAME) . '.webp';
+    // Adjusted destination path to include width and height
+    $destination = $webpDirectory . DIRECTORY_SEPARATOR 
+        . pathinfo($source, PATHINFO_FILENAME) 
+        . "_q{$quality}_w{$width}_h{$height}.webp";
 
-    // Konwersja pliku
-    if (Convert($source, $destination, $quality, $width, $height)) {
-        return $destination; // Zwraca ścieżkę do pliku WebP
+    if (shouldConvert($destination)) {
+        if (Convert($source, $destination, $quality, $width, $height)) {
+            return $destination; 
+        } else {
+            logError("Nie udało się skonwertować pliku do '$destination'.");
+            return false;
+        } 
     } else {
-        logError("Nie udało się skonwertować pliku do '$destination'.");
-        return false;
+        echo "pominięto konwertowanie";
+        return $destination;
     }
+}
+
+function shouldConvert($destination) {
+    if (file_exists($destination)) {
+        return false; 
+    }
+    return true;
 }
 
 function Convert($source, $destination, $quality, $width, $height) {
     $extension = strtolower(pathinfo($source, PATHINFO_EXTENSION));
+    $baseName = pathinfo($source, PATHINFO_FILENAME);
+    $webpDirectory = dirname($destination);
 
-    // Ładowanie obrazu w zależności od formatu
+    removeOldWebpFiles($webpDirectory, $baseName);
+
     switch ($extension) {
         case 'jpeg':
         case 'jpg':
@@ -61,13 +76,11 @@ function Convert($source, $destination, $quality, $width, $height) {
             return false;
     }
 
-    // Sprawdzenie, czy obraz został poprawnie załadowany
     if (!$image) {
         logError("Nie udało się załadować obrazu z '$source'.");
         return false;
     }
 
-    // Skalowanie obrazu, jeśli funkcja jest zdefiniowana
     if (function_exists('rescale')) {
         $origWidth = imagesx($image);
         $origHeight = imagesy($image);
@@ -75,7 +88,6 @@ function Convert($source, $destination, $quality, $width, $height) {
         $image = rescale($image, $width, $height, $origWidth, $origHeight, $extension);
     }
 
-    // Zapisywanie obrazu w formacie WebP
     $result = imagewebp($image, $destination, $quality);
     
     imagedestroy($image);
@@ -83,12 +95,22 @@ function Convert($source, $destination, $quality, $width, $height) {
     return $result ? true : false;
 }
 
+function removeOldWebpFiles($directory, $baseName) {
+    $pattern = $directory . DIRECTORY_SEPARATOR . $baseName . '_q*.webp';
+    $files = glob($pattern);
+
+    foreach ($files as $file) {
+        if (file_exists($file)) {
+            unlink($file);
+        }
+    }
+}
+
 function rescale($image, $width, $height, $origWidth, $origHeight, $extension) {
     if ($width == 0 && $height == 0) {
         return $image;
     }
 
-    // Jeśli tylko jeden z wymiarów jest ustawiony, oblicz drugi, zachowując proporcje
     if ($width == 0) {
         $width = ($height / $origHeight) * $origWidth;
     } elseif ($height == 0) {

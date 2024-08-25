@@ -1,5 +1,5 @@
 <?php
-include 'converter.php';
+include 'WebpAutomate/converter.php';
 
 function processAndDisplayImages($directory) {
     if (!is_dir($directory)) {
@@ -13,7 +13,7 @@ function processAndDisplayImages($directory) {
         $filePath = $directory . DIRECTORY_SEPARATOR . $file;
         
         if (is_file($filePath) && in_array(strtolower(pathinfo($filePath, PATHINFO_EXTENSION)), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
-            $destination = ConvertionToWebp($filePath);
+            $destination = ConvertionToWebp($filePath, 80, 0, 0);
             
             if ($destination) {
                 if (file_exists($destination)) {
