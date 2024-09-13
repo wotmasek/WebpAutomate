@@ -21,7 +21,7 @@ Converts images in a specified directory to WebP format and generates HTML image
 
 #### Parameters:
 - **`$FilePathOrDir`** (`string`): Path to the file or directory containing images to convert.
-- **`$Qality`** (`int`, optional): Quality of the WebP image, ranging from 0 to 100. Default is 75.
+- **`$Quality`** (`int`, optional): Quality of the WebP image, ranging from 0 to 100. Default is 75.
 - **`$WidthProperty`** (`int`, optional): Width to scale the image to. Default is 0 (no scaling).
 - **`$HeightProperty`** (`int`, optional): Height to scale the image to. Default is 0 (no scaling).
 
