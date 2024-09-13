@@ -1,4 +1,3 @@
-```markdown
 # WebPAutomate - Image conversion Library
 
 This PHP library provides functions for converting images to WebP format and managing WebP files. It supports both Windows and Linux environments.
@@ -74,4 +73,3 @@ The library includes an `logError($message)` function for logging errors. It wri
 ## Notes
 
 - Ensure proper error handling to manage any issues that arise during image conversion or directory creation.
-```
