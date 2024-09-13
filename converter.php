@@ -84,7 +84,6 @@
                 return false;
             } 
         } else {
-            echo "Skipped converting '$source', file already exists.\n";
             return $destination;
         }
     }
