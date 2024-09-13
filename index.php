@@ -13,7 +13,7 @@ function processAndDisplayImages($directory) {
         $filePath = $directory . DIRECTORY_SEPARATOR . $file;
         
         if (is_file($filePath) && in_array(strtolower(pathinfo($filePath, PATHINFO_EXTENSION)), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
-            $destination = ConvertionToWebp($filePath, 80, 0, 0);
+            $destination = ConvertImageToWebp($filePath, 80, 300, 0);
             
             if ($destination) {
                 if (file_exists($destination)) {
@@ -24,5 +24,7 @@ function processAndDisplayImages($directory) {
     }
 }
 
-processAndDisplayImages('images');
+//processAndDisplayImages('images');
+
+ConvertFolderToWebp('images');
 ?>

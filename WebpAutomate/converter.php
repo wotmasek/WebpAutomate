@@ -12,7 +12,7 @@ function logError($message) {
     file_put_contents($logFile, "[$timestamp] $message\n", FILE_APPEND);
 }
 
-function ConvertionToWebp($source, $quality = 75, $width = 0, $height = 0) {
+function ConvertImageToWebp($source, $quality = 75, $width = 0, $height = 0) {
     $webpDirectory = dirname($source) . DIRECTORY_SEPARATOR . 'webp';
 
     if (!is_dir($webpDirectory)) {
@@ -38,6 +38,32 @@ function ConvertionToWebp($source, $quality = 75, $width = 0, $height = 0) {
         echo "pominięto konwertowanie";
         return $destination;
     }
+}
+
+function ConvertFolderToWebp($directory, $quality = 75, $width = 0, $height = 0) {
+    if (!is_dir($directory)) {
+        logError("Nie udało się znaleźć '$destination'.");
+        return false;
+    }
+
+    $webpDirectory = dirname($directory) . DIRECTORY_SEPARATOR . 'webp';
+
+    $files = array_diff(scandir($directory), array('.', '..'));
+
+    foreach ($files as $file) {
+        $filePath = $directory . DIRECTORY_SEPARATOR . $file;
+        
+        if (is_file($filePath) && in_array(strtolower(pathinfo($filePath, PATHINFO_EXTENSION)), ['jpeg', 'jpg', 'png', 'gif', 'webp'])) {
+            $destination = ConvertImageToWebp($filePath, 80, 0, 0);
+            
+            if (!is_file($destination)) {
+                logError("Nie udało się znaleźć przekonwertowanego pliku: '$destination'.");
+                return false;
+            }
+        }
+    }
+
+    return $webpDirectory;
 }
 
 function shouldConvert($destination) {
