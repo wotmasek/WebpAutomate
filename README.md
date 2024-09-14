@@ -15,7 +15,7 @@ To use this library, follow these steps:
 
 ## Functions
 
-### `GetWebP($FilePathOrDir, $Qality = 75, $WidthProperty = 0, $HeightProperty = 0)`
+### `GetWebP($FilePathOrDir, $Quality = 75, $WidthProperty = 0, $HeightProperty = 0)`
 
 Converts images in a specified directory to WebP format and generates HTML image tags for these images. If a single file path is provided, it converts that image to WebP and generates a tag for it.
 
